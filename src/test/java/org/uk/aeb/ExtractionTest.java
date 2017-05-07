@@ -33,13 +33,6 @@ public class ExtractionTest {
   }
 
   @Test
-  public void testUnzipFileContents() throws Exception {
-
-      // TODO
-
-  }
-
-  @Test
   public void testExtractEmailBody() throws Exception {
       // TODO
 
