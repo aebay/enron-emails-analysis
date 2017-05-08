@@ -12,17 +12,14 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.io.*;
-import java.nio.file.*;
 import java.util.Arrays;
 import java.util.List;
-
-import org.apache.commons.io.FileUtils;
 
 import static org.junit.Assert.assertEquals;
 import static org.uk.aeb.processors.ingestion.Ingestion.getPathNames;
 import static org.uk.aeb.processors.ingestion.Ingestion.readPstZipFiles;
 import static org.uk.aeb.processors.ingestion.Ingestion.unzipFiles;
+import static org.uk.aeb.utilities.FileUtils.*;
 
 /**
  * Created by AEB on 06/05/17.
@@ -147,111 +144,6 @@ public class IngestionIT {
                 .map( pst -> pst.getMessageStore().getDisplayName() );
 
         assertEquals( expectedResults.toString(), actualResults.collect().toString() );
-
-    }
-
-    /**
-    * Writes a file, containing dummy data, to disk.
-    *
-    * @param pathName
-    */
-    private static void writeFile( final String pathName ) {
-
-        BufferedWriter bufferedWriter = null;
-        FileWriter fileWriter = null;
-
-        try {
-
-            String content = "Generic text string\n";
-
-            fileWriter = new FileWriter( pathName );
-            bufferedWriter = new BufferedWriter(fileWriter);
-            bufferedWriter.write(content);
-
-            logger.debug( pathName + " written to disk successfully." );
-
-        } catch (IOException e) {
-
-            e.printStackTrace();
-
-        } finally {
-
-            try {
-
-                if (bufferedWriter != null)
-                    bufferedWriter.close();
-
-                if (fileWriter != null)
-                    fileWriter.close();
-
-            } catch (IOException e) {
-
-                logger.debug( e );
-
-            }
-
-        }
-
-    }
-
-    /**
-    * Deletes a file or directory (and it's contents) from disk.
-    *
-    * @param pathName
-    */
-    private static void deletePath( final String pathName ) {
-
-        try {
-
-            File file = new File( pathName );
-            FileUtils.deleteDirectory( file );
-
-            logger.debug( pathName + " and contents deleted successfully" );
-
-        } catch( IOException e ) {
-            logger.debug( e );
-        }
-
-    }
-
-    /**
-    * Copy a file from one disk location to another.
-    *
-    * @param sourcePathName
-    * @param destinationPathName
-    */
-    private static void copyFile( final String sourcePathName, final String destinationPathName ) {
-
-        try {
-
-            File sourceFile = new File( sourcePathName );
-            File destinationFile = new File( destinationPathName );
-            FileUtils.copyFile( sourceFile, destinationFile );
-
-            logger.debug( sourcePathName + " copied to " + destinationPathName + " successfully" );
-
-        } catch( IOException e ){
-            logger.debug( e );
-        }
-
-    }
-
-    /**
-     * Create a directory
-     *
-     * @param pathName
-     */
-    private static void createDirectory( final String pathName ) {
-
-        try {
-
-            Path path = Paths.get(pathName);
-            Files.createDirectory(path);
-            logger.debug( pathName + " created successfully" );
-
-        } catch( IOException e ) {
-            logger.debug( e );
-        }
 
     }
 
