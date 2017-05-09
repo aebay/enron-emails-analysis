@@ -5,6 +5,7 @@ import com.pff.PSTFolder;
 import com.pff.PSTMessage;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -81,7 +82,7 @@ public class PstWrapper {
     {
         depth++;
 
-        // recursively iterate through the folders...
+        // recursively iterate through the folders
         if ( folder.hasSubfolders() ) {
             List< PSTFolder > childFolders = folder.getSubFolders();
             for (PSTFolder childFolder : childFolders) {

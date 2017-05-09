@@ -27,11 +27,11 @@ import static org.uk.aeb.utilities.FileUtils.deletePath;
 /**
   * Created by AEB on 06/05/17.
   */
-public class ExtractionIT {
+public class TransformationIT {
 
-    private static final String TEST_DIRECTORY_1 = "/tmp/edrm-enron-v1";
-    private static final String SOURCE_DIRECTORY_1 = "/data/edrm-enron-v1";
-    private static final String ZIP_FILE_NAME_1 = "/EDRM-Enron-PST-031.zip";
+    private static final String TEST_DIRECTORY_1 = "/tmp/edrm-enron-v2";
+    private static final String SOURCE_DIRECTORY_1 = "/data/edrm-enron-v2";
+    private static final String ZIP_FILE_NAME_1 = "/edrm-enron-v2_meyers-a_pst.zip";
 
     private static JavaSparkContext sparkContext;
 
@@ -41,8 +41,11 @@ public class ExtractionIT {
     public static void setUp() throws Exception {
 
         SparkConf sparkConf = new SparkConf()
-            .setAppName( "extractionTest" )
-            .setMaster( "local[*]" );
+                .setAppName( "extractionTest" )
+                .setMaster( "local[*]" )
+                .set( "spark.serializer", "org.apache.spark.serializer.KryoSerializer" )
+                .set( "spark.kryo.registrationRequired", "false" )
+                .set( "spark.kryoserializer.buffer.max", "128m" ); // this doesn't actually do anything when hardcoded, but is here for reference when running spark-submit
 
         sparkContext = new JavaSparkContext( sparkConf );
 
@@ -71,15 +74,31 @@ public class ExtractionIT {
 
         // expected results
         List<String> expectedResults = Arrays.asList( new String[]{
-                "email body 1",
-                "email body 2",
-                "email body 3"
+                "Bill:\r\n" +
+                        "\r\n" +
+                        "Please note the following due to the past two days schedules have been wrong in the EPE Schedules in Excel:\r\n" +
+                        "\r\n" +
+                        "Tag number 6181 has been cancelled (50mw to the CISO).\r\n" +
+                        "\r\n" +
+                        "Lending is wrong in the EPE schedules (it is 75mw from PSCO instead of 50mw).\r\n" +
+                        "\r\n" +
+                        "SPS is wrong for HE 08 (it is 130mw instead of 100mw).\r\n" +
+                        "\r\n" +
+                        "I thought you might like to since this is the only income we have currently for real-time and a major screw-up could hurt our relationship.\r\n" +
+                        "\r\n" +
+                        "Regards,\r\n" +
+                        "\r\n" +
+                        "Bert Meyers\r\n" +
+                        "\r\n" +
+                        "***********\r\n" +
+                        "EDRM Enron Email Data Set has been produced in EML, PST and NSF format by ZL Technologies, Inc. This Data Set is licensed under a Creative Commons Attribution 3.0 United States License <http://creativecommons.org/licenses/by/3.0/us/> . To provide attribution, please cite to \"ZL Technologies, Inc. (http://www.zlti.com).\"\r\n" +
+                        "***********\r\n"
         }  );
 
         // actual results
         List<String> actualResults = pstWrapper.getEmailBodies();
 
-        assertEquals( expectedResults.hashCode(), actualResults.hashCode() );
+        assertEquals( expectedResults.get( 0 ), actualResults.get( 0 ) );
 
     }
 
@@ -88,15 +107,17 @@ public class ExtractionIT {
 
         // expected results
         List<String> expectedResults = Arrays.asList( new String[]{
-                "name1@outlook.com",
-                "name2@gmail.com",
-                "name3@yahoo.com"
+                "Williams III; Bill",
+                "Slinger; Ryan",
+                "'thomas.rosendahl@ubspainewebber.com'"
         }  );
 
         // actual results
         List<String> actualResults = pstWrapper.getToRecipients();
 
-        assertEquals( expectedResults.hashCode(), actualResults.hashCode() );
+        assertEquals( expectedResults.get( 0 ), actualResults.get( 0 ) );
+        assertEquals( expectedResults.get( 1 ), actualResults.get( 1 ) );
+        assertEquals( expectedResults.get( 2 ), actualResults.get( 2 ) );
 
     }
 
@@ -105,15 +126,17 @@ public class ExtractionIT {
 
         // expected results
         List<String> expectedResults = Arrays.asList( new String[]{
-                "name1@outlook.com",
-                "name2@gmail.com",
-                "name3@yahoo.com"
+                "", // i.e. empty
+                "",
+                ""
         }  );
 
         // actual results
         List<String> actualResults = pstWrapper.getCcRecipients();
 
-        assertEquals( expectedResults.hashCode(), actualResults.hashCode() );
+        assertEquals( expectedResults.get( 0 ), actualResults.get( 0 ) );
+        assertEquals( expectedResults.get( 1 ), actualResults.get( 1 ) );
+        assertEquals( expectedResults.get( 2 ), actualResults.get( 2 ) );
 
     }
 
