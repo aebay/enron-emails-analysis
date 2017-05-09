@@ -2,14 +2,16 @@ package org.uk.aeb;
 
 import com.pff.PSTFile;
 import com.pff.PSTFolder;
+
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.input.PortableDataStream;
-import org.junit.AfterClass;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.uk.aeb.processors.transformation.PstWrapper;
+
+import org.uk.aeb.models.PstWrapper;
 
 import java.util.Arrays;
 import java.util.List;
@@ -33,7 +35,7 @@ public class ExtractionIT {
 
     private static JavaSparkContext sparkContext;
 
-    private static PSTFile pstFile;
+    private static PstWrapper pstWrapper;
 
     @BeforeClass
     public static void setUp() throws Exception {
@@ -52,16 +54,14 @@ public class ExtractionIT {
         List<String> filePaths = Arrays.asList( new String[]{TEST_DIRECTORY_1} );
         List< String > pathNames = getPathNames( filePaths );
         JavaPairRDD< String, PortableDataStream > zipPstFiles = readPstZipFiles( sparkContext, pathNames );
-        pstFile = unzipFiles( zipPstFiles ).first();
+        PSTFile pstFile = unzipFiles( zipPstFiles ).first();
 
-    }
+        // instantiate the PstWrapper class
+        PSTFolder rootFolder = pstFile.getRootFolder();
+        pstWrapper = new PstWrapper( rootFolder );
 
-    @AfterClass
-    public static void tearDown() throws Exception {
-
+        // clean up unneeded objects and processes
         sparkContext.stop();
-
-        // delete test data
         deletePath( TEST_DIRECTORY_1 );
 
     }
@@ -69,24 +69,51 @@ public class ExtractionIT {
     @Test
     public void testExtractEmailBody() throws Exception {
 
-        // get the folder
-        PSTFolder rootFolder = pstFile.getRootFolder();
+        // expected results
+        List<String> expectedResults = Arrays.asList( new String[]{
+                "email body 1",
+                "email body 2",
+                "email body 3"
+        }  );
 
-        PstWrapper.processFolder(rootFolder);
+        // actual results
+        List<String> actualResults = pstWrapper.getEmailBodies();
+
+        assertEquals( expectedResults.hashCode(), actualResults.hashCode() );
 
     }
 
     @Test
     public void testExtractEmailToFieldRecipientNames() throws Exception {
 
-        // TODO
+        // expected results
+        List<String> expectedResults = Arrays.asList( new String[]{
+                "name1@outlook.com",
+                "name2@gmail.com",
+                "name3@yahoo.com"
+        }  );
+
+        // actual results
+        List<String> actualResults = pstWrapper.getToRecipients();
+
+        assertEquals( expectedResults.hashCode(), actualResults.hashCode() );
 
     }
 
     @Test
     public void testExtractEmailCCFieldRecipientNames() throws Exception {
 
-        // TODO
+        // expected results
+        List<String> expectedResults = Arrays.asList( new String[]{
+                "name1@outlook.com",
+                "name2@gmail.com",
+                "name3@yahoo.com"
+        }  );
+
+        // actual results
+        List<String> actualResults = pstWrapper.getCcRecipients();
+
+        assertEquals( expectedResults.hashCode(), actualResults.hashCode() );
 
     }
 

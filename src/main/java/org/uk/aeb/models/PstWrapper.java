@@ -1,4 +1,4 @@
-package org.uk.aeb.processors.transformation;
+package org.uk.aeb.models;
 
 import com.pff.PSTException;
 import com.pff.PSTFolder;

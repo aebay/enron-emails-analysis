@@ -17,7 +17,7 @@ import java.util.zip.ZipInputStream;
 /**
  * Created by AEB on 07/05/17.
  *
- * Module that handles the Ingestion of files
+ * Module that handles the ingestion of files
  */
 final public class Ingestion {
 
