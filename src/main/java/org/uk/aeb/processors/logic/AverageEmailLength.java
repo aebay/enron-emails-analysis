@@ -1,12 +1,7 @@
 package org.uk.aeb.processors.logic;
 
-import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.uk.aeb.models.PstWrapper;
-import scala.Tuple2;
-
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * Created by AEB on 09/05/17.
@@ -29,9 +24,11 @@ final public class AverageEmailLength {
 
         JavaRDD< String > emailBodies = extractEmailBodies( pstWrapper );
 
-        JavaPairRDD< String, Long > wordsPerEmail =
+        JavaRDD< String > cleanedEmailBodies = cleanEmailBodies( emailBodies );
 
+        JavaRDD< Integer > wordsPerEmail = countWordsPerEmail( cleanedEmailBodies ).cache();
 
+        return averageWordsPerEmail( wordsPerEmail );
 
     }
 
@@ -53,21 +50,68 @@ final public class AverageEmailLength {
     }
 
     /**
+     * Replace delimiters with spaces and remove duplicated whitespace.
+     *
+     * @param emailBodies
+     * @return
+     */
+    public static JavaRDD< String > cleanEmailBodies( final JavaRDD<String> emailBodies ) {
+
+        JavaRDD< String > cleanedEmailBodies = emailBodies.map( email -> {
+
+            String cleanedEmail =
+                    email.replace( "\n", " " )
+                            .replace( "\r", " " )
+                            .replace( "\t", " " )
+                            .replaceAll("\\s+", " "); // to remove duplicated whitespace
+
+            return cleanedEmail;
+
+        } );
+
+        return cleanedEmailBodies;
+
+    }
+
+    /**
      * Calculate the words per email.
      *
      * @param emailBodies
      * @return
      */
-    public static JavaPairRDD< String, Long > wordsPerEmail( final JavaRDD< String > emailBodies ) {
+    public static JavaRDD< Integer > countWordsPerEmail( final JavaRDD< String > emailBodies ) {
 
-        JavaPairRDD< String, Long > wordsPerEmail = emailBodies.map( email -> {
+        JavaRDD< Integer > wordsPerEmail = emailBodies
+                .map( email -> email.split( " " ).length );
 
-            List<String> emailWords = Arrays.asList( email.split( " " ) );
+        return wordsPerEmail;
 
-            String emailHash // to save space
+    }
 
-            return new Tuple2<>();
-        } );
+    /**
+     * <p>
+     *  Calculates the mean average number of words per email.
+     *
+     *  Words per email are normalised by the total number of emails before being
+     *  aggregated to avoid an overflow if something like long had been used.
+     * </p>
+     *
+     * @param wordsPerEmail
+     * @return
+     */
+    public static Double averageWordsPerEmail( JavaRDD< Integer > wordsPerEmail ) {
+
+        // get the count of records
+        final Long numberOfEmails = wordsPerEmail.count();
+
+        // normalise the words per e-mail
+        JavaRDD< Double > normalisedCount =
+                wordsPerEmail.map( count -> count.doubleValue() / numberOfEmails );
+
+        // add the normalised totals together to calculate the average
+        Double averageWords = normalisedCount.reduce( (a, b) -> a + b );
+
+        return averageWords;
 
     }
 
