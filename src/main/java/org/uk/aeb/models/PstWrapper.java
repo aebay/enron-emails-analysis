@@ -5,14 +5,11 @@ import com.pff.PSTFolder;
 import com.pff.PSTMessage;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by AEB on 08/05/17.
- *
- * Code adapted from http://www.devjavasource.com/java/java-program-to-read-pst-and-ost-files/
  *
  * There are only getters, since the e-mail contents are generated on initialisation.
  */
@@ -78,7 +75,7 @@ public class PstWrapper {
      * @throws PSTException
      * @throws java.io.IOException
      */
-    public void processFolder(PSTFolder folder) throws PSTException, java.io.IOException
+    public void processFolder(PSTFolder folder) throws PSTException, IOException
     {
         depth++;
 
@@ -97,8 +94,10 @@ public class PstWrapper {
             while (email != null) {
 
                 emailBodies.add( email.getBody() );
-                toRecipients.add( email.getDisplayTo() );
-                ccRecipients.add( email.getDisplayCC() );
+
+                Recipients recipients = new Recipients( email );
+                toRecipients.addAll( recipients.getTo() );
+                ccRecipients.addAll( recipients.getCc() );
 
                 email = (PSTMessage)folder.getNextChild();
 

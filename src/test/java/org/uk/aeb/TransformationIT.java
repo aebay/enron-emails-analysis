@@ -115,6 +115,9 @@ public class TransformationIT {
         // actual results
         List<String> actualResults = pstWrapper.getToRecipients();
 
+        for ( String emailAddresses : actualResults )
+            System.out.println( emailAddresses );
+
         assertEquals( expectedResults.get( 0 ), actualResults.get( 0 ) );
         assertEquals( expectedResults.get( 1 ), actualResults.get( 1 ) );
         assertEquals( expectedResults.get( 2 ), actualResults.get( 2 ) );
