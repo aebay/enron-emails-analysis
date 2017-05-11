@@ -28,7 +28,7 @@ import static org.uk.aeb.utilities.FileUtils.*;
  */
 public class IngestionIT {
 
-    static Logger logger = Logger.getLogger("org.uk.aeb.IngestionIT");
+    private final static Logger logger = Logger.getLogger("org.uk.aeb.IngestionIT");
 
     private static final String TEST_DIRECTORY_1 = "/tmp/edrm-enron-v1";
     private static final String TEST_DIRECTORY_2 = "/tmp/edrm-enron-v2";
