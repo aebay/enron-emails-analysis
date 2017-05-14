@@ -34,7 +34,7 @@ final public class Executor {
     public static void run( final JavaSparkContext sparkContext, final Config applicationConfig ) {
 
         // ingestion
-        List<String> inputPathList = Utilities.parseList( applicationConfig.getString( "input.source.directories" ), "|" );
+        List<String> inputPathList = Utilities.parseList( applicationConfig.getString( "input.source.directories" ), "," );
         JavaRDD<PSTFile> pstFiles = Ingestion.run( sparkContext, inputPathList );
 
         // transformation

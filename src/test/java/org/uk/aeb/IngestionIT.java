@@ -1,5 +1,7 @@
 package org.uk.aeb;
 
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 import org.apache.log4j.Logger;
 
 import org.apache.spark.SparkConf;
@@ -30,29 +32,49 @@ public class IngestionIT {
 
     private final static Logger logger = Logger.getLogger("org.uk.aeb.IngestionIT");
 
-    private static final String TEST_DIRECTORY_1 = "/tmp/edrm-enron-v1";
-    private static final String TEST_DIRECTORY_2 = "/tmp/edrm-enron-v2";
-    private static final String SOURCE_DIRECTORY_1 = "/data/edrm-enron-v1";
-    private static final String SOURCE_DIRECTORY_2 = "/data/edrm-enron-v2";
+    private static final String CONFIG_PATH = "";
+    private static final String APPLICATION_CONFIG_FILE = "application.properties";
+    private static final String SPARK_CONFIG_FILE = "spark.properties";
 
     private static final String TXT_FILE_NAME = "/edrm-enron-v2_meyers_a_pst.txt.zip";
     private static final String XLS_FILE_NAME = "/edrm-enron-v2_meyers_a_pst.xls.zip";
-    private static final String ZIP_FILE_NAME_1 = "/EDRM-Enron-PST-031.zip";
-    private static final String ZIP_FILE_NAME_2 = "/edrm-enron-v2_meyers-a_pst.zip";
-    private static final String ZIP_FILE_NAME_3 = "/edrm-enron-v2_panus-s_pst.zip";
+
+
+    private static String TEST_DIRECTORY_1;
+    private static String TEST_DIRECTORY_2;
+    private static String SOURCE_DIRECTORY_1;
+    private static String SOURCE_DIRECTORY_2;
+
+    private static String ZIP_FILE_NAME_1;
+    private static String ZIP_FILE_NAME_2;
+    private static String ZIP_FILE_NAME_3;
 
     private static JavaSparkContext sparkContext;
 
     @BeforeClass
     public static void setUp() throws Exception {
 
-        SparkConf sparkConf = new SparkConf()
-                .setAppName( "extractionTest" )
-                .setMaster( "local[*]" )
-                .set( "spark.serializer", "org.apache.spark.serializer.KryoSerializer" )
-                .set( "spark.kryo.registrationRequired", "false" )
-                .set( "spark.kryoserializer.buffer.max", "128m" ); // this doesn't actually do anything when hardcoded, but is here for reference when running spark-submit
+        // configuration
+        Config sparkConfig = ConfigFactory.load( CONFIG_PATH + SPARK_CONFIG_FILE );
+        Config applicationConfig = ConfigFactory.load( CONFIG_PATH + APPLICATION_CONFIG_FILE );
 
+        TEST_DIRECTORY_1 = applicationConfig.getString( "test.root.directory.one.path" );
+        TEST_DIRECTORY_2 = applicationConfig.getString( "test.root.directory.two.path" );
+        SOURCE_DIRECTORY_1 = applicationConfig.getString( "test.source.directory.one.path" );
+        SOURCE_DIRECTORY_2 = applicationConfig.getString( "test.source.directory.two.path" );
+
+        ZIP_FILE_NAME_1 = applicationConfig.getString( "test.source.directory.one.file" );
+        String[] sourceDirectoryTwoFiles = applicationConfig.getString( "test.source.directory.two.file" ).split( "," );
+        ZIP_FILE_NAME_2 = sourceDirectoryTwoFiles[0];
+        ZIP_FILE_NAME_3 = sourceDirectoryTwoFiles[1];
+
+
+        SparkConf sparkConf = new SparkConf()
+                .setMaster( sparkConfig.getString( "spark.master" ) )
+                .setAppName( "Ingestion IT" )
+                .set( "spark.serializer", sparkConfig.getString( "spark.serializer" ) )
+                .set( "spark.kryo.registrationRequired", sparkConfig.getString( "kryo.registration" ) )
+                .set( "spark.kryoserializer.buffer.max", sparkConfig.getString( "kryo.buffer.max" ) ); // this doesn't actually do anything when hardcoded, but is here for reference when running spark-submit
 
         sparkContext = new JavaSparkContext( sparkConf );
 

@@ -3,6 +3,7 @@ package org.uk.aeb.driver;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 
+import java.io.File;
 import java.io.IOException;
 
 /**
@@ -64,11 +65,11 @@ public class Configurations {
      */
     private void loadConfigurations() {
 
-        final String sparkPath = path.concat( SPARK_FILE );
-        final String applicationPath = path.concat( APPLICATION_FILE );
+        final File sparkPath = new File( path.concat( SPARK_FILE ) );
+        final File applicationPath = new File( path.concat( APPLICATION_FILE ) );
 
-        sparkConfig = ConfigFactory.load( sparkPath );
-        applicationConfig = ConfigFactory.load( applicationPath );
+        sparkConfig = ConfigFactory.parseFile( sparkPath );
+        applicationConfig = ConfigFactory.parseFile( applicationPath );
 
     }
 }

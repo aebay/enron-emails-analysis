@@ -1,5 +1,7 @@
 package org.uk.aeb;
 
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
@@ -24,14 +26,21 @@ public class TopEmailRecipientTest {
 
     private static JavaSparkContext sparkContext;
 
+    private static final String CONFIG_PATH = "";
+    private static final String SPARK_CONFIG_FILE = "spark.properties";
+
     @BeforeClass
     public static void setUp() throws Exception {
 
+        // configuration
+        Config sparkConfig = ConfigFactory.load( CONFIG_PATH + SPARK_CONFIG_FILE );
+
         SparkConf sparkConf = new SparkConf()
-                .setAppName( "extractionTest" )
-                .setMaster( "local[*]" )
-                .set( "spark.kryo.registrationRequired", "false" )
-                .set( "spark.kryoserializer.buffer.max", "128m" ); // this doesn't actually do anything when hardcoded, but is here for reference when running spark-submit
+                .setMaster( sparkConfig.getString( "spark.master" ) )
+                .setAppName( "Top email recipient test" )
+                .set( "spark.serializer", sparkConfig.getString( "spark.serializer" ) )
+                .set( "spark.kryo.registrationRequired", sparkConfig.getString( "kryo.registration" ) )
+                .set( "spark.kryoserializer.buffer.max", sparkConfig.getString( "kryo.buffer.max" ) ); // this doesn't actually do anything when hardcoded, but is here for reference when running spark-submit
 
         sparkContext = new JavaSparkContext( sparkConf );
 

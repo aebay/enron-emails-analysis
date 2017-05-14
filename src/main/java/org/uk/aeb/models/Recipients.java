@@ -64,7 +64,7 @@ public class Recipients {
         int numRecipients = 0;
 
         String originalEmailAddress;
-        String emailAddress;
+        String emailAddress = null;
 
         PSTRecipient recipient;
 
@@ -87,11 +87,13 @@ public class Recipients {
             else {
 
                 i++;
-                recipient = message.getRecipient(i);
-                originalEmailAddress = recipient.getEmailAddress();
-
-                emailAddress = cleanCnEmailAddress( originalEmailAddress, "cn=", 3 );
-
+                try {
+                    recipient = message.getRecipient(i);
+                    originalEmailAddress = recipient.getEmailAddress();
+                    emailAddress = cleanCnEmailAddress( originalEmailAddress, "cn=", 3 );
+                } catch ( PSTException e ) {
+                    logger.warn( e );
+                }
             }
 
             // bin email address by sender type
@@ -133,6 +135,12 @@ public class Recipients {
      *     /O=ENRON/OU=NA/CN=RECIPIENTS/CN=DL-PortlandRealTimeShift
      * </p>
      *
+     * <p>
+     *     Note: in some rare situations, only the display name is present
+     *     in the email metadata.  These email recipients are omitted from
+     *     the analysis.
+     * </p>
+     *
      * @param rawEmailAddress
      * @param emailCharacterSequenceMatch : sequence of characters to match on
      * @param emailMatchOffset            : offset from match start index where the email substring begins
@@ -149,10 +157,15 @@ public class Recipients {
         String lowerCaseEmailAddress = rawEmailAddress.toLowerCase();
         String lowerCaseCharacterMatch = emailCharacterSequenceMatch.toLowerCase();
 
-        // case where the email address is split over two recipient objects
+        // case where the email address is split over two recipient objects but the raw email address is present in the second object
         if ( lowerCaseEmailAddress.contains( "@" ) && !lowerCaseEmailAddress.contains( lowerCaseCharacterMatch ) ) {
             emailAddress = lowerCaseEmailAddress;
         }
+
+        // case where the email address metadata only contains display name data
+        else if ( lowerCaseEmailAddress.split( " " ).length == 2 ) return null;
+
+        // case where the email address is split over two recipient objects and metadata is available to reconstruct the internal email address
         else {
 
             emailNameStartIndex = lowerCaseEmailAddress.lastIndexOf( lowerCaseCharacterMatch );

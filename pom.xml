@@ -24,6 +24,8 @@
 
         <maven.compiler.version>3.6.1</maven.compiler.version>
         <maven.shade.version>3.0.0</maven.shade.version>
+        <maven.assembly.version>3.0.0</maven.assembly.version>
+        <maven.jar.version>3.0.2</maven.jar.version>
         <maven.compiler.lang.version>1.8</maven.compiler.lang.version>
 
     </properties>
@@ -82,13 +84,25 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
                 <version>${maven.shade.version}</version>
+
                 <configuration>
+                    <filters>
+                        <filter>
+                            <artifact>*:*</artifact>
+                            <excludes>
+                                <exclude>META-INF/*.SF</exclude>
+                                <exclude>META-INF/*.DSA</exclude>
+                                <exclude>META-INF/*.RSA</exclude>
+                            </excludes>
+                        </filter>
+                    </filters>
                     <artifactSet>
                         <excludes>
                             <exclude>org.apache.spark:spark-core_${scala.compat.version}}</exclude>
                         </excludes>
                     </artifactSet>
                 </configuration>
+
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -97,6 +111,35 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>${maven.assembly.version}</version>
+                <configuration>
+                    <descriptors>
+                        <descriptor>assembly.xml</descriptor>
+                    </descriptors>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>${maven.jar.version}</version>
+                <configuration>
+                    <excludes>
+                        <exclude>**/*.properties</exclude>
+                    </excludes>
+                </configuration>
             </plugin>
 
         </plugins>
