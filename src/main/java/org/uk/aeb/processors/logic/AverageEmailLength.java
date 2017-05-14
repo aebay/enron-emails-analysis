@@ -74,7 +74,12 @@ final public class AverageEmailLength {
     }
 
     /**
-     * Calculate the words per email.
+     * <p>
+     *     Calculate the words per email.
+     *
+     *     Assumption: number of words in an email will not exceed the maximum
+     *     Integer limit (2147483647)
+     * </p>
      *
      * @param emailBodies
      * @return
@@ -92,8 +97,8 @@ final public class AverageEmailLength {
      * <p>
      *  Calculates the mean average number of words per email.
      *
-     *  Words per email are normalised by the total number of emails before being
-     *  aggregated to avoid an overflow if something like long had been used.
+     *  It's assumed that the total number of words in the entire data source will
+     *  not exceed the long limit (9223372036854775807L).
      * </p>
      *
      * @param wordsPerEmail
@@ -104,14 +109,15 @@ final public class AverageEmailLength {
         // get the count of records
         final Long numberOfEmails = wordsPerEmail.count();
 
-        // normalise the words per e-mail
-        JavaRDD< Double > normalisedCount =
-                wordsPerEmail.map( count -> count.doubleValue() / numberOfEmails );
+        // aggregate the number of words per email
+        Long totalEmailWords = wordsPerEmail
+                .map( count -> count.longValue() )
+                .reduce( (a,b) -> a + b );
 
-        // add the normalised totals together to calculate the average
-        Double averageWords = normalisedCount.reduce( (a, b) -> a + b );
+        // calculate the average
+        Double averageWordsPerEmail = totalEmailWords.doubleValue() / numberOfEmails;
 
-        return averageWords;
+        return averageWordsPerEmail;
 
     }
 
