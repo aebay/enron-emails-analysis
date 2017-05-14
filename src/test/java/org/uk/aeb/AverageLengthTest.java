@@ -25,7 +25,9 @@ public class AverageLengthTest {
 
     SparkConf sparkConf = new SparkConf()
             .setAppName( "extractionTest" )
-            .setMaster( "local[*]" );
+            .setMaster( "local[*]" )
+            .set( "spark.kryo.registrationRequired", "false" )
+            .set( "spark.kryoserializer.buffer.max", "128m" ); // this doesn't actually do anything when hardcoded, but is here for reference when running spark-submit
 
     sparkContext = new JavaSparkContext( sparkConf );
 

@@ -19,8 +19,10 @@ public class PersistenceIT {
   public static void setUp() throws Exception {
 
     SparkConf sparkConf = new SparkConf()
-      .setAppName( "extractionTest" )
-      .setMaster( "local[*]" );
+        .setAppName( "extractionTest" )
+        .setMaster( "local[*]" )
+        .set( "spark.kryo.registrationRequired", "false" )
+        .set( "spark.kryoserializer.buffer.max", "128m" ); // this doesn't actually do anything when hardcoded, but is here for reference when running spark-submit
 
     sparkContext = new JavaSparkContext( sparkConf );
 

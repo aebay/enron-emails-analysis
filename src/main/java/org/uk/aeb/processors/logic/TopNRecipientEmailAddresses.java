@@ -34,10 +34,11 @@ final public class TopNRecipientEmailAddresses {
         JavaPairRDD< String, Long > ccRecipientWordCount = wordCount( pstWrappers.flatMap( wrapper -> wrapper.getCcRecipients() ) )
                 .mapToPair( kv -> new Tuple2<>( kv._1, kv._2 / 2 ) );
 
-        // combine and rank recipients
-        JavaPairRDD< String, Long > rankedEmails = combineEmailLists( toRecipientWordCount, ccRecipientWordCount );
+        // combine recipients
+        JavaPairRDD< String, Long > recipientWordCount = combineEmailLists( toRecipientWordCount, ccRecipientWordCount );
 
-        List< Tuple2<String, Long > > topNEmailAddresses = rankedEmails.takeOrdered( listLength, new RecipientComparator() );
+        // retrieve top N email addresses by count
+        List< Tuple2<String, Long > > topNEmailAddresses = orderEmailList( recipientWordCount, listLength );
 
         return topNEmailAddresses;
 
@@ -75,6 +76,23 @@ final public class TopNRecipientEmailAddresses {
                 .reduceByKey( (a,b) -> a + b );
 
         return recipientWordCount;
+
+    }
+
+    /**
+     * <p>
+     *   Returns a list of emails in address-count pairs in descending order for
+     *   the length specified.
+     * </p>
+     *
+     * @param recipientWordCount
+     * @param listLength
+     * @return
+     */
+    public static List< Tuple2<String, Long > > orderEmailList( final JavaPairRDD< String, Long > recipientWordCount,
+                                                                final Integer listLength ) {
+
+        return recipientWordCount.takeOrdered( listLength, new RecipientComparator() );
 
     }
 
