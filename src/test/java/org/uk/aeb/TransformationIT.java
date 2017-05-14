@@ -107,16 +107,13 @@ public class TransformationIT {
 
         // expected results
         List<String> expectedResults = Arrays.asList( new String[]{
-                "Williams III; Bill",
-                "Slinger; Ryan",
-                "'thomas.rosendahl@ubspainewebber.com'"
+                "bwillia5@enron.com",
+                "rslinger@enron.com",
+                "thomas.rosendahl@ubspainewebber.com"
         }  );
 
         // actual results
         List<String> actualResults = pstWrapper.getToRecipients();
-
-        for ( String emailAddresses : actualResults )
-            System.out.println( emailAddresses );
 
         assertEquals( expectedResults.get( 0 ), actualResults.get( 0 ) );
         assertEquals( expectedResults.get( 1 ), actualResults.get( 1 ) );
@@ -129,9 +126,9 @@ public class TransformationIT {
 
         // expected results
         List<String> expectedResults = Arrays.asList( new String[]{
-                "", // i.e. empty
-                "",
-                ""
+                "bwillia5@enron.com", // i.e. empty
+                "bwillia5@enron.com",
+                "david.steiner@enron.com"
         }  );
 
         // actual results

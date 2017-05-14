@@ -1,8 +1,6 @@
 package org.uk.aeb.models;
 
-import com.pff.PSTException;
-import com.pff.PSTFolder;
-import com.pff.PSTMessage;
+import com.pff.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -96,7 +94,6 @@ public class PstWrapper {
                 emailBodies.add( email.getBody() );
 
                 Recipients recipients = new Recipients( email );
-                email.getDisplayTo();
                 toRecipients.addAll( recipients.getTo() );
                 ccRecipients.addAll( recipients.getCc() );
 
@@ -106,21 +103,6 @@ public class PstWrapper {
             depth--;
         }
         depth--;
-    }
-
-    /**
-     * <p>
-     *   Parses the full string of recipients into separate name
-     *   groupings.
-     * </p>
-     *
-     * @param recipients
-     * @return
-     */
-    private List<String> parseRecipients( final String recipients ) {
-
-        // split
-
     }
 
 }

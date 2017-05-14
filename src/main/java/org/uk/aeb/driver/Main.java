@@ -35,7 +35,9 @@ public class Main {
             Config sparkConfig = configurations.getSparkConfig();
             SparkConf sparkConf = new SparkConf()
                     .setMaster( sparkConfig.getString( "spark.master" ) )
-                    .setAppName( sparkConfig.getString( "app.name" ) );
+                    .setAppName( sparkConfig.getString( "app.name" ) )
+                    .set( "spark.kryo.registrationRequired", sparkConfig.getString( "kryo.registration" ) )
+                    .set( "spark.kryoserializer.buffer.max", sparkConfig.getString( "kryo.buffer.max" ) ); // this doesn't actually do anything when hardcoded, but is here for reference when running spark-submit
 
             JavaSparkContext sparkContext = new JavaSparkContext( sparkConf );
 

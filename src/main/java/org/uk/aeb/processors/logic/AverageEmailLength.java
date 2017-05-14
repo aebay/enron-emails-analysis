@@ -17,12 +17,12 @@ final public class AverageEmailLength {
      *   per list.
      * </p>
      *
-     * @param pstWrapper
+     * @param pstWrappers
      * @return
      */
-    public static Double run(final JavaRDD<PstWrapper> pstWrapper ) {
+    public static Double calculate(final JavaRDD<PstWrapper> pstWrappers ) {
 
-        JavaRDD< String > emailBodies = extractEmailBodies( pstWrapper );
+        JavaRDD< String > emailBodies = extractEmailBodies( pstWrappers );
 
         JavaRDD< String > cleanedEmailBodies = cleanEmailBodies( emailBodies );
 

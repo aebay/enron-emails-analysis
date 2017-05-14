@@ -1,8 +1,8 @@
 package org.uk.aeb;
 
-
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -34,7 +34,21 @@ public class TopEmailRecipientTest {
     }
 
     @Test
-    public void testTopEmailRecipients() throws Exception {
+    public void testWordCount() throws Exception {
+
+        // TODO
+
+    }
+
+    @Test
+    public void testCombineEmailLists() throws Exception {
+
+        // TODO
+
+    }
+
+    @Test
+    public void testTopNEmailAddresses() throws Exception {
 
         // TODO
 

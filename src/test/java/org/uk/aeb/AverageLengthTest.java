@@ -48,8 +48,8 @@ public class AverageLengthTest {
 
       // expected results
       List<String> expectedResults = Arrays.asList(
-              "abc  123   45   2",
-              "def  456   78#'"
+              "abc 123 45 2",
+              "def 456 78#'"
       );
 
       // actual results
