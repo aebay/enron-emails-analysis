@@ -163,16 +163,21 @@ public class Recipients {
         }
 
         // case where the email address metadata only contains display name data
-        else if ( lowerCaseEmailAddress.split( " " ).length == 2 ) return null;
+        else if ( lowerCaseEmailAddress.split( " " ).length == 2 ) emailAddress = null;
 
         // case where the email address is split over two recipient objects and metadata is available to reconstruct the internal email address
         else {
 
             emailNameStartIndex = lowerCaseEmailAddress.lastIndexOf( lowerCaseCharacterMatch );
 
-            emailAddress = lowerCaseEmailAddress.substring( emailNameStartIndex + emailMatchOffset )
-                    .toLowerCase()
-                    .concat( "@enron.com" );
+            try {
+                emailAddress = lowerCaseEmailAddress.substring( emailNameStartIndex + emailMatchOffset )
+                        .toLowerCase()
+                        .concat( "@enron.com" );
+            } catch( StringIndexOutOfBoundsException e ) {
+                emailAddress = null;
+                logger.warn( e );
+            }
 
         }
 
