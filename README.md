@@ -62,6 +62,7 @@ in `resources` for either the main application or the tests.
 ```
 -DconfDir=file:///<PROJECT_PATH>/enron-emails-analysis/src/main/resources
 ```
+6. Run the `org.uk.aeb.driver.Main` class.
 
 Note that some of the integration tests make use of sample Enron files to carry out the test.
 The following files must be present on the given file path(s) in order for the tests to work:
@@ -89,7 +90,7 @@ To build the project you must have Maven installed and configured on your path.
   --class org.uk.aeb.driver.Main \
   --master local[*] \
   --conf spark.kryoserializer.buffer.max=1g \
-  --conf spark.driver.extraJavaOptions='-DconfDir=<CONFIGURATION_FILE_PATH>' 
+  --conf spark.driver.extraJavaOptions='-DconfDir=<CONFIGURATION_FILE_PATH>' \ 
   <JAR_PATH_NAME>
   
   
