@@ -2,6 +2,7 @@ package org.uk.aeb.driver;
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
+import org.apache.hadoop.conf.Configuration;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,23 +15,28 @@ import java.io.IOException;
  *     into application.
  * </p>
  */
-public class Configurations {
+public class ConfigWrapper {
 
     final private static String CONF_DIR = "confDir";
     final private static String SPARK_FILE = "/spark.properties";
     final private static String APPLICATION_FILE = "/application.properties";
+    final private static String HADOOP_FILE = "/hadoop.properties";
 
     private String path;
 
     private Config sparkConfig;
     private Config applicationConfig;
+    private Config hadoopConfig;
+
+    private Configuration configuration;
 
     /**
      * Constructor
      */
-    public Configurations() throws IOException {
+    public ConfigWrapper() throws IOException {
         setPath();
         loadConfigurations();
+        setFsConfiguration();
     }
 
     /**
@@ -40,6 +46,12 @@ public class Configurations {
     public Config getSparkConfig() {
         return sparkConfig;
     }
+
+    /**
+     *
+     * @return
+     */
+    public Configuration getConfiguration() { return configuration; }
 
     /**
      *
@@ -67,9 +79,19 @@ public class Configurations {
 
         final File sparkPath = new File( path.concat( SPARK_FILE ) );
         final File applicationPath = new File( path.concat( APPLICATION_FILE ) );
+        final File hadoopPath = new File( path.concat( HADOOP_FILE ) );
 
         sparkConfig = ConfigFactory.parseFile( sparkPath );
         applicationConfig = ConfigFactory.parseFile( applicationPath );
+        hadoopConfig = ConfigFactory.parseFile( hadoopPath );
+
+    }
+
+    private void setFsConfiguration() {
+
+        configuration = new Configuration();
+        configuration.addResource( hadoopConfig.getString( "core.site.pathname" ) );
+        configuration.addResource( hadoopConfig.getString( "hdfs.site.pathname" ) );
 
     }
 }

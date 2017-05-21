@@ -56,7 +56,7 @@ in `resources` for either the main application or the tests.
 
 1. Run the `org.uk.aeb.driver.Main` class.  It will fail, this is ok.
 2. Go to _Run->Edit Configurations..._.
-3. Click on `Application->Main` in the left-hand panel to bring up the run configurations for the driver class.
+3. Click on `Application->Main` in the left-hand panel to bring up the run configWrapper for the driver class.
 4. Click on `VM options`.
 5. Enter the following into the box, replacing `<PROJECT_PATH>` with the full path to your project:
 ```

@@ -18,6 +18,7 @@
 
         <scala.compat.version>2.11</scala.compat.version>
         <spark.version>1.6.3</spark.version>
+        <hadoop.version>2.6.5</hadoop.version>
         <junit.version>4.12</junit.version>
         <libpst.version>0.9.3</libpst.version>
         <commons.version>3.5</commons.version>
@@ -37,6 +38,13 @@
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-core_${scala.compat.version}</artifactId>
             <version>${spark.version}</version>
+        </dependency>
+
+        <!-- HADOOP -->
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-client</artifactId>
+            <version>${hadoop.version}</version>
         </dependency>
 
         <!-- PARSE PST FILES -->

@@ -4,6 +4,7 @@ import com.pff.PSTFile;
 
 import com.typesafe.config.Config;
 
+import org.apache.hadoop.conf.Configuration;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 
@@ -31,11 +32,13 @@ final public class Executor {
      * @param sparkContext
      * @param applicationConfig
      */
-    public static void run( final JavaSparkContext sparkContext, final Config applicationConfig ) {
+    public static void run( final JavaSparkContext sparkContext,
+                            final Config applicationConfig,
+                            final Configuration configuration ) {
 
         // ingestion
         List<String> inputPathList = Utilities.parseList( applicationConfig.getString( "input.source.directories" ), "," );
-        JavaRDD<PSTFile> pstFiles = Ingestion.run( sparkContext, inputPathList );
+        JavaRDD<PSTFile> pstFiles = Ingestion.run( sparkContext, inputPathList, configuration );
 
         // transformation
         JavaRDD<PstWrapper> pstWrappers = Transformation.run( pstFiles ).cache();

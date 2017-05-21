@@ -30,9 +30,9 @@ public class Main {
 
         try {
 
-            Configurations configurations = new Configurations();
+            ConfigWrapper configWrapper = new ConfigWrapper();
 
-            Config sparkConfig = configurations.getSparkConfig();
+            Config sparkConfig = configWrapper.getSparkConfig();
             SparkConf sparkConf = new SparkConf()
                     .setMaster( sparkConfig.getString( "spark.master" ) )
                     .setAppName( sparkConfig.getString( "app.name" ) )
@@ -41,7 +41,7 @@ public class Main {
 
             JavaSparkContext sparkContext = new JavaSparkContext( sparkConf );
 
-            Executor.run( sparkContext, configurations.getApplicationConfig() );
+            Executor.run( sparkContext, configWrapper.getApplicationConfig(), configWrapper.getConfiguration() );
 
         } catch( IOException e ) {
 
