@@ -17,6 +17,7 @@ import org.uk.aeb.processors.persistence.Persistence;
 import org.uk.aeb.processors.transformation.Transformation;
 import scala.Tuple2;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -34,7 +35,7 @@ final public class Executor {
      */
     public static void run( final JavaSparkContext sparkContext,
                             final Config applicationConfig,
-                            final Configuration configuration ) {
+                            final Configuration configuration ) throws IOException {
 
         // ingestion
         List<String> inputPathList = Utilities.parseList( applicationConfig.getString( "input.source.directories" ), "," );

@@ -26,7 +26,7 @@ TBD
 TBD
 
 * EBS volume: Cold HDD 500 GB
-* EC2 ??? cluster configured for Apache Spark
+* EC2 ??? cluster configured for Apache Spark and Apache Hadoop
 
 The instructions below assume that you have set up an EC2 cluster 
 with the above specifications and have the AWS CLI installed.
@@ -71,6 +71,8 @@ The following files must be present on the given file path(s) in order for the t
   /data/edrm-enron-v2/edrm-enron-v2_meyers-a_pst.zip
   /data/edrm-enron-v2/edrm-enron-v2_panus-s_pst.zip
 
+You should also have a local Hadoop cluster running in pseudo-distributed mode.
+
 ## Build
 
 To build the project you must have Maven installed and configured on your path.
@@ -89,6 +91,7 @@ To build the project you must have Maven installed and configured on your path.
 ./bin/spark-submit \
   --class org.uk.aeb.driver.Main \
   --master local[*] \
+  --driver-memory 8g \
   --conf spark.kryoserializer.buffer.max=1g \
   --conf spark.driver.extraJavaOptions='-DconfDir=<CONFIGURATION_FILE_PATH>' \ 
   <JAR_PATH_NAME>

@@ -5,6 +5,7 @@ import com.pff.PSTFolder;
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
+import org.apache.hadoop.conf.Configuration;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaSparkContext;
@@ -19,12 +20,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.uk.aeb.processors.ingestion.Ingestion.getPathNames;
-import static org.uk.aeb.processors.ingestion.Ingestion.readPstZipFiles;
-import static org.uk.aeb.processors.ingestion.Ingestion.unzipFiles;
-import static org.uk.aeb.utilities.FileUtils.copyFile;
-import static org.uk.aeb.utilities.FileUtils.createDirectory;
-import static org.uk.aeb.utilities.FileUtils.deletePath;
+import static org.uk.aeb.processors.ingestion.Ingestion.*;
+import static org.uk.aeb.utilities.HdfsUtils.*;
 
 /**
   * Created by AEB on 06/05/17.
@@ -34,6 +31,7 @@ public class TransformationIT {
     private static final String CONFIG_PATH = "";
     private static final String APPLICATION_CONFIG_FILE = "application.properties";
     private static final String SPARK_CONFIG_FILE = "spark.properties";
+    private static final String HADOOP_CONFIG_FILE = "hadoop.properties";
 
     private static String TEST_DIRECTORY_1;
     private static String SOURCE_DIRECTORY_1;
@@ -43,20 +41,23 @@ public class TransformationIT {
 
     private static PstWrapper pstWrapper;
 
+    private static Configuration configuration;
+
     @BeforeClass
     public static void setUp() throws Exception {
 
         // configuration
         Config sparkConfig = ConfigFactory.load( CONFIG_PATH + SPARK_CONFIG_FILE );
         Config applicationConfig = ConfigFactory.load( CONFIG_PATH + APPLICATION_CONFIG_FILE );
+        Config hadoopConfig = ConfigFactory.load( CONFIG_PATH + HADOOP_CONFIG_FILE );
 
         TEST_DIRECTORY_1 = applicationConfig.getString( "test.root.directory.two.path" );
         SOURCE_DIRECTORY_1 = applicationConfig.getString( "test.source.directory.two.path" );
         ZIP_FILE_NAME_1 = applicationConfig.getString( "test.source.directory.two.file" ).split(",")[0];
 
-        System.out.println( "Test directory: " + TEST_DIRECTORY_1 );
-        System.out.println( "Source directory: " + SOURCE_DIRECTORY_1 );
-        System.out.println( "Files: " + ZIP_FILE_NAME_1 );
+        configuration = new Configuration();
+        configuration.addResource( hadoopConfig.getString( "core.site.pathname" ) );
+        configuration.addResource( hadoopConfig.getString( "hdfs.site.pathname" ) );
 
         SparkConf sparkConf = new SparkConf()
                 .setMaster( sparkConfig.getString( "spark.master" ) )
@@ -67,13 +68,15 @@ public class TransformationIT {
 
         sparkContext = new JavaSparkContext( sparkConf );
 
-        // create test directory and copy test file to it
-        createDirectory( TEST_DIRECTORY_1 );
-        copyFile( SOURCE_DIRECTORY_1 + ZIP_FILE_NAME_1, TEST_DIRECTORY_1 + ZIP_FILE_NAME_1 );
+        // create test directories
+        createHdfsDirectory( TEST_DIRECTORY_1, configuration );
+
+        // copy test data to test directories
+        copyFileToHdfs( SOURCE_DIRECTORY_1 + ZIP_FILE_NAME_1, TEST_DIRECTORY_1 + ZIP_FILE_NAME_1, configuration );
 
         // create a PSTFile object to use in the test
         List<String> filePaths = Arrays.asList( new String[]{TEST_DIRECTORY_1} );
-        List< String > pathNames = getPathNames( filePaths );
+        List< String > pathNames = getHdfsPathNames( filePaths, configuration );
         JavaPairRDD< String, PortableDataStream > zipPstFiles = readPstZipFiles( sparkContext, pathNames );
         PSTFile pstFile = unzipFiles( zipPstFiles ).first();
 
@@ -83,7 +86,7 @@ public class TransformationIT {
 
         // clean up unneeded objects and processes
         sparkContext.stop();
-        deletePath( TEST_DIRECTORY_1 );
+        deleteHdfsDirectory( TEST_DIRECTORY_1, configuration );
 
     }
 

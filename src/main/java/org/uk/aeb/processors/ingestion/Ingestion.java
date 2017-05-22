@@ -39,9 +39,9 @@ final public class Ingestion {
      */
     public static JavaRDD< PSTFile > run( final JavaSparkContext sparkContext,
                                           final List<String> filePaths,
-                                          final Configuration configuration ) {
+                                          final Configuration configuration ) throws IOException {
 
-        List< String > pathNames = getPathNames( filePaths );
+        List< String > pathNames = getHdfsPathNames( filePaths, configuration );
 
         JavaPairRDD< String, PortableDataStream > zipPstFiles = readPstZipFiles( sparkContext, pathNames );
 
